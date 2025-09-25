@@ -6,7 +6,7 @@ from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
-from config import cfg
+from .config import cfg
 
 class OrdinalLoss(nn.Module):
     """Loss pour la régression ordinale avec gestion des âges continus"""
