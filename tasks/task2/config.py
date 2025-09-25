@@ -2,40 +2,37 @@ import torch
 import os
 from pathlib import Path
 
-class AdvancedConfig:
-    """Configuration optimisée pour MAE < 4.0"""
+class UltimateConfig:
+    """Configuration optimisée pour performance maximale"""
     
-    # Chemins (seront adaptés pour Colab)
+    # Chemins 
     PROJECT_ROOT = Path("/content/facial_challenge")
     DATA_DIR = PROJECT_ROOT / "data" / "task2"
-    TRAIN_DIR = DATA_DIR / "train"
+    TRAIN_DIR = DATA_DIR / "train" 
     TEST_DIR = DATA_DIR / "test"
     
-    # Hyperparamètres OPTIMISÉS
-    BACKBONE = "resnet50"  # ResNet101 trop lourd pour 50 epochs
+    # Hyperparamètres ULTIMES
+    BACKBONE = "resnet50"
     PRETRAINED = True
     INPUT_SIZE = (224, 224)
-    BATCH_SIZE = 64  # Plus grand sur GPU
-    NUM_EPOCHS = 50  # ⬅️ 50 EPOCHS COMME DEMANDÉ
-    MAX_AGE_VALUE = 116 # Âge maximal du dataset UTKFace
-    EARLY_STOPPING_PATIENCE = 15
-    LEARNING_RATE = 1e-4
+    BATCH_SIZE = 64
+    NUM_EPOCHS = 50
+    MAX_AGE_VALUE = 80  # 🔥 Adapté à nos données (16-77)
+    EARLY_STOPPING_PATIENCE = 10
+    LEARNING_RATE = 1e-3  # 🔥 Plus agressif
     DROPOUT_RATE = 0.3
     
     # Configuration entraînement
     DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
     NUM_WORKERS = 2
     PIN_MEMORY = True if torch.cuda.is_available() else False
-    
-    # Seed pour reproductibilité
     SEED = 42
     
     # Sauvegarde
-    OUTPUT_DIR = PROJECT_ROOT / "outputs" / "task2_advanced"
+    OUTPUT_DIR = PROJECT_ROOT / "outputs" / "task2_ultimate"
     MODEL_SAVE_PATH = OUTPUT_DIR / "best_model.pth"
     
     def __init__(self):
         self.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Instance globale
-cfg = AdvancedConfig()
+cfg = UltimateConfig()
