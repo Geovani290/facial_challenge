@@ -6,7 +6,7 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader, random_split
 import torchvision.transforms as transforms
 from torchvision.transforms import autoaugment
-from config import cfg
+from .config import cfg
 
 class AgeDataset(Dataset):
     """Dataset avec parsing robuste et data augmentation aggressive"""
