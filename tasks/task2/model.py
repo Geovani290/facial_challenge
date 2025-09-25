@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torchvision.models as models
-from.config import cfg
+from config import cfg
 
 class OrdinalAgeModel(nn.Module):
     """Modèle optimisé pour l'estimation d'âge en utilisant la régression ordinale."""
@@ -9,7 +9,6 @@ class OrdinalAgeModel(nn.Module):
     def __init__(self, backbone=cfg.BACKBONE, pretrained=cfg.PRETRAINED, num_classes=cfg.MAX_AGE_VALUE):
         super().__init__()
         
-        # Backbone pré-entraîné
         if backbone == 'resnet50':
             self.backbone = models.resnet50(pretrained=pretrained)
             in_features = self.backbone.fc.in_features
@@ -17,14 +16,24 @@ class OrdinalAgeModel(nn.Module):
         else:
             raise ValueError(f"Backbone {backbone} non supporté")
         
-        # Tête de régression ordinale (CORAL)
+        # Tête de régression ordinale
         self.ordinal_regressor = nn.Sequential(
             nn.Dropout(cfg.DROPOUT_RATE),
-            nn.Linear(in_features, num_classes),
-            # La perte BCEWithLogits gère déjà le Sigmoid, donc pas de couche finale de sigmoid
+            nn.Linear(in_features, 1024),
+            nn.ReLU(inplace=True),
+            nn.BatchNorm1d(1024),
+            nn.Dropout(0.2),
+            nn.Linear(1024, 512),
+            nn.ReLU(inplace=True),
+            nn.BatchNorm1d(512),
+            nn.Dropout(0.1),
+            nn.Linear(512, 256),
+            nn.ReLU(inplace=True),
+            nn.Linear(256, 128),
+            nn.ReLU(inplace=True),
+            nn.Linear(128, num_classes + 1) # Sortie: num_classes + 1 logits
         )
         
-        # Initialisation des poids
         self._initialize_weights()
     
     def _initialize_weights(self):
@@ -34,6 +43,9 @@ class OrdinalAgeModel(nn.Module):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
                 if m.bias is not None:
                     nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.BatchNorm1d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
     
     def forward(self, x):
         features = self.backbone(x)
@@ -42,7 +54,7 @@ class OrdinalAgeModel(nn.Module):
         
         logits = self.ordinal_regressor(features)
         
-        return logits
+        return logits.squeeze()
 
 def create_ordinal_model():
     """Factory function pour le modèle de régression ordinale"""
