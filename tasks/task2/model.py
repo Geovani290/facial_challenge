@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torchvision.models as models
-from config import cfg
+from .config import cfg
 
 class OrdinalAgeModel(nn.Module):
     """Modèle optimisé pour l'estimation d'âge en utilisant la régression ordinale."""
